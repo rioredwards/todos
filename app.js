@@ -1,7 +1,7 @@
 /* Imports */
 // this will check if we have a user and set signout link if it exists
 import './auth/user.js';
-import { createTodo, getTodos } from './fetch-utils.js';
+import { completeTodo, createTodo, getTodos } from './fetch-utils.js';
 // Part A: import create todo
 // Part B: import get todos
 // Part C: import complete todos
@@ -68,7 +68,6 @@ removeButton.addEventListener('click', async () => {
         displayError();
     } else {
         // > Part D: reset todos state to an empty array:
-
         displayTodos();
     }
 });
@@ -89,7 +88,6 @@ function displayTodos() {
     for (const todo of todos) {
         const todoEl = renderTodo(todo);
         todoList.append(todoEl);
-
         // > Part C: Add a click event listener for the todoEl
         //      - call the async supabase function to delete all todos
         //        and get the response
@@ -98,5 +96,18 @@ function displayTodos() {
         //          - find the index of todo in todos
         //          - update that index of todos with the response data
         //          - redisplay the todos
+        todoEl.addEventListener('click', async () => {
+            const response = await completeTodo(todo.id);
+            error = response.error;
+            const updatedTodo = response.data;
+
+            if (error) {
+                displayError();
+            } else {
+                const index = todos.indexOf(todo);
+                todos[index] = updatedTodo;
+                displayTodos();
+            }
+        });
     }
 }

@@ -1,7 +1,7 @@
 /* Imports */
 // this will check if we have a user and set signout link if it exists
 import './auth/user.js';
-import { createTodo } from './fetch-utils.js';
+import { createTodo, getTodos } from './fetch-utils.js';
 // Part A: import create todo
 // Part B: import get todos
 // Part C: import complete todos
@@ -27,6 +27,15 @@ window.addEventListener('load', async () => {
     //      - set the todos and error state from the response
     //      - if there's an error call displayError
     //      - otherwise, display the todos
+    const response = await getTodos();
+    error = response.error;
+    todos = response.data;
+
+    if (error) {
+        displayError();
+    } else {
+        displayTodos();
+    }
 });
 
 addTodoForm.addEventListener('submit', async (e) => {

@@ -1,6 +1,12 @@
 /* Imports */
 // this will check if we have a user and set signout link if it exists
 import './auth/user.js';
+import {
+    completeTodo,
+    createTodo,
+    deleteAllTodos,
+    getTodos,
+} from './fetch-utils.js';
 // Part A: import create todo
 // Part B: import get todos
 // Part C: import complete todos
@@ -26,6 +32,15 @@ window.addEventListener('load', async () => {
     //      - set the todos and error state from the response
     //      - if there's an error call displayError
     //      - otherwise, display the todos
+    const response = await getTodos();
+    error = response.error;
+    todos = response.data;
+
+    if (error) {
+        displayError();
+    } else {
+        displayTodos();
+    }
 });
 
 addTodoForm.addEventListener('submit', async (e) => {
@@ -36,7 +51,7 @@ addTodoForm.addEventListener('submit', async (e) => {
     };
 
     // > Part A: Call the function to create a todo, passing in "newTodo":
-    const response = await null; // ???
+    const response = await createTodo(newTodo);
     error = response.error;
     const todo = response.data;
 
@@ -51,14 +66,14 @@ addTodoForm.addEventListener('submit', async (e) => {
 
 removeButton.addEventListener('click', async () => {
     // > Part D: Call the async supabase function to delete all todos
-    const response = null; // change me
+    const response = await deleteAllTodos(); // change me
     error = response.error;
 
     if (error) {
         displayError();
     } else {
         // > Part D: reset todos state to an empty array:
-
+        todos = [];
         displayTodos();
     }
 });
@@ -79,7 +94,6 @@ function displayTodos() {
     for (const todo of todos) {
         const todoEl = renderTodo(todo);
         todoList.append(todoEl);
-
         // > Part C: Add a click event listener for the todoEl
         //      - call the async supabase function to delete all todos
         //        and get the response
@@ -88,5 +102,18 @@ function displayTodos() {
         //          - find the index of todo in todos
         //          - update that index of todos with the response data
         //          - redisplay the todos
+        todoEl.addEventListener('click', async () => {
+            const response = await completeTodo(todo.id);
+            error = response.error;
+            const updatedTodo = response.data;
+
+            if (error) {
+                displayError();
+            } else {
+                const index = todos.indexOf(todo);
+                todos[index] = updatedTodo;
+                displayTodos();
+            }
+        });
     }
 }
